@@ -1,0 +1,994 @@
+:root {
+    /* Chess.com Dark Theme Palette */
+    --bg-dark: #302e2b;
+    --bg-panel: #262421;
+    --text-main: #ffffff;
+    --text-muted: #bababa;
+
+    --primary-accent: #81b64c;
+    /* Chess.com Green button */
+    --secondary-accent: #454341;
+
+    /* Board Colors (Green Theme) */
+    --board-white: #eeeed2;
+    --board-black: #769656;
+
+    --highlight-move: rgba(0, 0, 0, 0.14);
+    /* Subtle dot shadow */
+    --selected-square: rgba(247, 247, 105, 0.6);
+    /* Standard Yellow */
+
+    --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.app-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+/* Background Effects - Removed for clean look */
+.bg-orb {
+    display: none;
+}
+
+/* Glassmorphism Panel */
+/* Removed as per instruction to remove space/orb effects and glassmorphism is no longer part of the theme */
+
+/* Header */
+.main-header {
+    display: block;
+    /* Restore visibility */
+    text-align: center;
+    padding: 1rem 0 2rem 0;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.main-header h1 {
+    font-weight: 800;
+    font-size: 3rem;
+    margin: 0;
+    /* Beautiful Gradient Text */
+    background: linear-gradient(135deg, #ffffff 30%, var(--primary-accent) 100%);
+    background-clip: text;
+    /* Standard property */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tagline {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-top: 0.5rem;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
+}
+
+/* Layout */
+.game-area {
+    display: flex;
+    gap: 0;
+    /* Connected look */
+    width: 100%;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+/* Board */
+.board-container {
+    padding: 5px;
+    /* Border rim */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    /* Deep shadow */
+    border-radius: 4px;
+    overflow: hidden;
+    background: #262421;
+    /* Dark rim matching sidebar */
+    margin: 1rem 0;
+    /* Spacing from bars */
+    border: 3px solid #383633;
+}
+
+.chess-board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 600px !important;
+    height: 600px !important;
+    max-width: 100%;
+    aspect-ratio: 1/1;
+    border: none;
+    user-select: none;
+    background-color: #302e2b;
+    /* Fallback bg */
+}
+
+@media (max-width: 900px) {
+    .app-container {
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+    }
+
+    .game-area {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .chess-board {
+        width: 90vw;
+        height: 90vw;
+    }
+}
+
+.square {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+/* Fix empty ruleset if it exists here, or remove it */
+/* Also ensuring board colors are robust */
+:root {
+    --board-white: #eeeed2;
+    --board-black: #769656;
+    /* ... other vars ... */
+}
+
+/* Ensuring .square has a background even if variables fail (unlikely but good for debug) */
+.square.white {
+    background-color: #eeeed2;
+    /* Fallback */
+    background-color: var(--board-white);
+    color: var(--board-black);
+}
+
+.square.black {
+    background-color: #769656;
+    /* Fallback */
+    background-color: var(--board-black);
+    color: var(--board-white);
+}
+
+/* Highlight Styles - Matching User Reference */
+.square.selected {
+    background-color: rgba(246, 246, 105, 0.6) !important;
+    /* Bright Yellow */
+    box-shadow: none;
+}
+
+.square.highlight {
+    cursor: pointer;
+    background-color: rgba(20, 133, 30, 0.5);
+    /* Green Overlay */
+    box-shadow: none;
+}
+
+.square.highlight::after {
+    content: '';
+    position: absolute;
+    width: 25%;
+    height: 25%;
+    background-color: rgba(0, 0, 0, 0.2);
+    /* Semi-transparent dark dot */
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.square.highlight.capture {
+    background-color: rgba(20, 133, 30, 0.5);
+    /* Keep green background for consistency or use red? */
+    /* Usually games show captures with a ring or red corner. Let's stick to the green theme but maybe a ring for capture? */
+    /* User specific image shows green square with dot. It didn't show capture. */
+    /* Let's make capture distinct but consistent. */
+}
+
+.square.highlight.capture::after {
+    /* Ring for capture */
+    display: block;
+    width: 85%;
+    height: 85%;
+    background-color: transparent;
+    border: 6px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+}
+
+/* Board Coordinates */
+.coordinate {
+    position: absolute;
+    font-size: 0.75rem;
+    font-weight: 700;
+    pointer-events: none;
+    user-select: none;
+}
+
+.coord-rank {
+    top: 2px;
+    left: 2px;
+}
+
+.coord-file {
+    bottom: 2px;
+    right: 2px;
+}
+
+.square.white .coordinate {
+    color: var(--board-black);
+}
+
+.square.black .coordinate {
+    color: var(--board-white);
+}
+
+/* Pieces with Shadow for Realism */
+.piece {
+    width: 85%;
+    height: 85%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Ensure clicks pass through to square if we use square listeners, OR handle on piece */
+    /* If we set pointer-events: none, we can't drag it easily unless drag is on square? */
+    /* UI.js puts drag listener on PIECE. So we need pointer-events: all */
+    pointer-events: auto;
+    z-index: 2;
+    filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.3));
+    /* Depth */
+}
+
+.piece:hover {
+    transform: translateY(-2px) scale(1.05);
+    /* Lift effect */
+    filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.4));
+}
+
+/* Layout Grid - 3 Columns */
+.app-layout {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--bg-dark);
+}
+
+/* 1. Sidebar Nav (Left) */
+.sidebar-nav {
+    width: 80px;
+    /* Collapsed width style */
+    background-color: #262421;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid #383633;
+    padding-top: 1rem;
+    flex-shrink: 0;
+}
+
+.logo-area {
+    color: var(--primary-accent);
+    font-weight: 800;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.75rem;
+    padding: 0.8rem 0;
+    width: 100%;
+    transition: background1 0.2s;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.nav-item .icon {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+
+/* 2. Main Content (Board) */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* Allow header above board */
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: #302e2b;
+}
+
+/* Re-style header for inside main content */
+.main-content .main-header {
+    margin-bottom: 2rem;
+    padding: 0;
+}
+
+.main-content .main-header h1 {
+    font-size: 2.5rem;
+}
+
+.board-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.player-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #fff;
+    font-weight: 600;
+    height: 40px;
+}
+
+.avatar-small {
+    width: 32px;
+    height: 32px;
+    background-color: #ccc;
+    border-radius: 4px;
+}
+
+.avatar-small.white {
+    background: #eeeed2;
+}
+
+.avatar-small.black {
+    background: #769656;
+}
+
+.captured-pieces {
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+    /* Push to right */
+    background: none;
+    /* Override old */
+    padding: 0;
+    margin-top: 0;
+}
+
+.captured-piece {
+    width: 20px;
+    height: 20px;
+}
+
+.board-container {
+    padding: 5px;
+    /* Border rim */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    /* Deep shadow */
+    border-radius: 4px;
+    overflow: hidden;
+    background: #262421;
+    /* Dark rim matching sidebar */
+    margin: 1rem 0;
+    /* Spacing from bars */
+    border: 3px solid #383633;
+}
+
+#chess-board {
+    width: 600px;
+    height: 600px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    background-color: #769656;
+    /* Backup color */
+}
+
+.square {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.square.white {
+    background-color: #eeeed2;
+}
+
+.square.black {
+    background-color: #769656;
+}
+
+.square.highlight::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+}
+
+.square.capture::after {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: 6px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0;
+    /* Or circle? keeping it full square ring for capture */
+    box-sizing: border-box;
+    border-radius: 50%;
+    /* Ring */
+}
+
+.piece {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: grab;
+}
+
+.piece:active {
+    cursor: grabbing;
+}
+
+/* 3. Right Side Panel */
+.side-panel {
+    width: 400px;
+    background-color: #262421;
+    padding: 2rem;
+    border-left: 1px solid #383633;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    flex-shrink: 0;
+}
+
+.panel-header h2 {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.panel-header h2::before {
+    content: '♟️';
+}
+
+/* Menu Cards */
+.play-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.menu-card {
+    display: flex;
+    align-items: center;
+    background-color: #3d3b38;
+    /* Card BG */
+    padding: 1rem;
+    border-radius: 8px;
+    /* Rounded corners */
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.2s;
+    user-select: none;
+    border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+}
+
+.menu-card:hover {
+    background-color: #4b4845;
+    transform: translateY(-2px);
+}
+
+
+
+/* Icons */
+.card-icon {
+    font-size: 2.5rem;
+    margin-right: 1.5rem;
+}
+
+#card-play-bot .card-icon {
+    color: #f1c40f;
+}
+
+/* Yellowish */
+#card-play-friend .card-icon {
+    color: #eebb99;
+}
+
+/* Handshake color */
+#card-puzzles .card-icon {
+    color: #81b64c;
+}
+
+/* Green */
+
+.card-info h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+.card-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #ababab;
+}
+
+/* Game Controls Area (Bottom of sidebar) */
+.game-controls-area {
+    margin-top: auto;
+    background: #21201d;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.action-buttons-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.action-btn {
+    background: #3d3b38;
+    border: none;
+    color: #ccc;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.action-btn:hover {
+    background: #504d4a;
+    color: #fff;
+}
+
+.status-box {
+    text-align: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #444;
+}
+
+/* Settings Panel (Bot Level) */
+.settings-panel {
+    background: #302e2b;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+/* Pro Documentation Styles */
+.tutorial-content {
+    text-align: left;
+    max-height: 60vh;
+    /* Taller on large screens */
+    overflow-y: auto;
+    padding-right: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #e0e0e0;
+}
+
+.doc-section {
+    margin-bottom: 3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
+.doc-section:last-child {
+    border-bottom: none;
+}
+
+.doc-header {
+    color: var(--primary-accent);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.doc-sub-header {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.doc-text {
+    margin-bottom: 1rem;
+}
+
+/* Highlight Box for Special Rules */
+.highlight-box {
+    background: rgba(129, 182, 76, 0.15);
+    /* Tint of primary green */
+    border-left: 4px solid var(--primary-accent);
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    font-style: italic;
+}
+
+.highlight-box strong {
+    color: #fff;
+}
+
+/* Strategy Table */
+.strategy-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: #262421;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.strategy-table th,
+.strategy-table td {
+    padding: 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid #383633;
+}
+
+.strategy-table th {
+    background: #383633;
+    color: var(--primary-accent);
+}
+
+.strategy-table td:last-child {
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Bullet lists */
+.doc-list {
+    list-style-type: none;
+    padding-left: 1rem;
+}
+
+.doc-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.doc-list li::before {
+    content: '♟️';
+    position: absolute;
+    left: 0;
+    font-size: 0.8rem;
+    color: var(--primary-accent);
+    top: 4px;
+}
+
+#level-name {
+    color: var(--primary-accent);
+}
+
+/* Hidden but accessible helpers */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .app-layout {
+        flex-direction: column;
+    }
+
+    .sidebar-nav {
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
+        height: auto;
+        border-bottom: 1px solid #333;
+    }
+
+    .nav-item {
+        padding: 0.5rem 1rem;
+        width: auto;
+    }
+
+    .side-panel {
+        width: 100%;
+        padding: 1rem;
+    }
+
+    .board-wrapper {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .chess-board {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1/1;
+    }
+}
+
+#status-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background-color: var(--bg-panel);
+    width: 400px;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.modal.show .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+.modal-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.result-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    background: #21201d;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.player-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.player-result.winner {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.avatar-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    position: relative;
+}
+
+.avatar-circle.white {
+    background-color: #eeeed2;
+    border: 2px solid #fff;
+}
+
+.avatar-circle.black {
+    background-color: #769656;
+    border: 2px solid #000;
+}
+
+.player-result.winner .avatar-circle {
+    box-shadow: 0 0 15px var(--primary-accent);
+    border-color: var(--primary-accent);
+}
+
+/* Crown icon for winner logic could go here */
+
+.vs-divider {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-muted);
+}
+
+.score {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.player-result.winner .score {
+    color: var(--primary-accent);
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-accent);
+    color: white;
+    font-size: 1.1rem;
+    padding: 1rem;
+}
+
+/* Tutorial Styles */
+.tutorial-content {
+    text-align: left;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.tutorial-section {
+    margin-bottom: 1.5rem;
+}
+
+.tutorial-section h3 {
+    color: var(--primary-accent);
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.2rem;
+}
+
+.tutorial-section ul {
+    list-style-type: none;
+    padding-left: 0.5rem;
+}
+
+.tutorial-section li {
+    margin-bottom: 0.5rem;
+}
+
+/* Scrollbar for modal */
+.tutorial-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tutorial-content::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+}
+
+/* Puzzle Banner Animation */
+.puzzle-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(90deg, #2c3e50, #262421);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 5px solid var(--primary-accent);
+    margin-bottom: 1rem;
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.puzzle-icon {
+    font-size: 2rem;
+}
+
+.puzzle-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.puzzle-title {
+    font-weight: 800;
+    color: var(--primary-accent);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.puzzle-desc {
+    color: #fff;
+    font-weight: 600;
+}
+
+.pulse-text {
+    animation: pulse 2s infinite;
+    color: var(--primary-accent);
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 10px var(--primary-accent);
+    }
+
+    100% {
+        opacity: 0.8;
+    }
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLRC Chess Master</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Chess Logic Library -->
+    <script src="chess.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Floating Background Elements -->
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
+
+        <div class="app-layout">
+            <!-- 1. Left Navigation Sidebar -->
+            <nav class="sidebar-nav">
+                <div class="logo-area">Start</div>
+                <a href="#" id="btn-play" class="nav-item active"><span class="icon">♟️</span> Play</a>
+                <a href="#" id="btn-puzzle" class="nav-item"><span class="icon">🧩</span> Puzzles</a>
+                <a href="#" id="btn-learn" class="nav-item"><span class="icon">🎓</span> Learn</a>
+            </nav>
+
+            <!-- 2. Main Game Area -->
+            <main class="main-content">
+                <!-- Main Header Restored inside Main Content -->
+                <div class="main-header">
+                    <h1>NLRC Chess Master</h1>
+                    <p class="tagline">Play Together. Think Deeper.</p>
+                </div>
+
+                <div class="board-wrapper">
+                    <!-- User/Opponent info bars could go here -->
+                    <div class="player-bar top">
+                        <div class="avatar-small black"></div>
+                        <span class="player-label">Opponent (Black)</span>
+                        <div id="captured-black" class="captured-pieces"></div>
+                    </div>
+
+                    <div class="board-container">
+                        <div id="chess-board" class="chess-board"></div>
+                    </div>
+
+                    <div class="player-bar bottom">
+                        <div class="avatar-small white"></div>
+                        <span class="player-label">You (White)</span>
+                        <div id="captured-white" class="captured-pieces"></div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 3. Right Action Panel -->
+            <aside class="side-panel">
+                <div class="panel-header">
+                    <h2>Play Chess</h2>
+                </div>
+
+                <!-- Play Menu (Mode Selection) -->
+                <div class="play-menu" id="play-menu">
+
+                    <div class="menu-card active" id="card-play-bot">
+                        <div class="card-icon">🤖</div>
+                        <div class="card-info">
+                            <h3>Play Bots</h3>
+                            <p>Challenge a bot from Easy to Master</p>
+                        </div>
+                    </div>
+
+                    <div class="menu-card" id="card-play-friend">
+                        <div class="card-icon">🤝</div>
+                        <div class="card-info">
+                            <h3>Play a Friend</h3>
+                            <p>Invite a friend to a game of chess</p>
+                        </div>
+                    </div>
+
+                    <!-- Tournaments Removed -->
+
+                </div>
+
+                <!-- In-Game Controls (Hidden initially or integrated?) -->
+                <!-- We'll keep them structurally here but style them to fit -->
+                <div class="game-controls-area">
+
+                    <!-- AI Level Slider (Only shows when Bot mode active) -->
+                    <div id="ai-settings-panel" class="settings-panel hidden">
+                        <div class="slider-header">
+                            <span>Bot Strength:</span>
+                            <span id="level-name">Single Mind</span>
+                        </div>
+                        <div id="level-desc" style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">Random & Basic
+                            checking</div>
+                        <input type="range" id="ai-level-slider" min="1" max="17" value="1">
+                    </div>
+
+                    <div class="action-buttons-grid">
+                        <button id="btn-reset" class="action-btn" title="New Game">➕ New</button>
+                        <button id="btn-undo" class="action-btn" title="Undo">↩️ Undo</button>
+                        <button id="btn-flip" class="action-btn" title="Flip Board">🔁 Flip</button>
+                    </div>
+
+                    <!-- Hidden logic buttons for mode switching simulation -->
+                    <button id="btn-mode-ai" style="display:none"></button>
+                    <button id="btn-mode-friend" style="display:none"></button>
+                    <!-- Map Tournament card to Puzzle for now -->
+                    <button id="btn-puzzle" style="display:none"></button>
+                    <button id="btn-tutorial" style="display:none"></button>
+
+                    <div class="status-box">
+                        <span id="status-text">White to move</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="game-over-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">White Won!</h2>
+                    <p id="modal-reason">by checkmate</p>
+                </div>
+
+                <div class="result-display">
+                    <div class="player-result winner" id="result-white">
+                        <div class="avatar-circle white"></div>
+                        <span class="player-name">White</span>
+                        <span class="score" id="score-white">1</span>
+                    </div>
+                    <div class="vs-divider">-</div>
+                    <div class="player-result" id="result-black">
+                        <div class="avatar-circle black"></div>
+                        <span class="player-name">Black</span>
+                        <span class="score" id="score-black">0</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button id="btn-new-game-modal" class="btn btn-primary">New Game</button>
+                    <button id="btn-analyze" class="btn btn-secondary">Game Review</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Application Scripts (Order Matters for Global Scope) -->
+        <script src="ai.js"></script>
+        <script src="ui.js"></script>
+        <script src="puzzles.js"></script>
+        <script src="main.js"></script>
+</body>
+
+</html>
